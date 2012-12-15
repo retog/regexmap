@@ -24,28 +24,32 @@ public class Parser {
 
 	private static State parse(PushbackReader in) throws IOException {
 		State result = new State();
-		paserInto(result, in);
+		parseInto(result, in);
 		return result;
 	}
 
-	private static void paserInto(State result, PushbackReader in) throws IOException {
+	private static void parseInto(State result, PushbackReader in) throws IOException {
 		int currentChar = in.read();
 		if (currentChar == -1) {
 			result.markAsEndState();
-		} else {
-			
+		} else {	
 			int nextChar = in.read();
+			State targetState;
 			if (nextChar != -1) {
 				if (nextChar == '*') {
-					throw new UnsupportedOperationException();
+					targetState = result;
 				} else {
 					in.unread(nextChar);
+					targetState = new State();
 				}
-			}
-			if (currentChar == '.') {
-				result.addTransition(new AcceptAny(parse(in)));
 			} else {
-				result.addTransition(new AcceptSingle(parse(in), (char) currentChar));
+				targetState = new State();
+			}
+			parseInto(targetState, in);
+			if (currentChar == '.') {
+				result.addTransition(new AcceptAny(targetState));
+			} else {
+				result.addTransition(new AcceptSingle(targetState, (char) currentChar));
 			}
 		}
 	}
