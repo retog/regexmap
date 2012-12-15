@@ -69,5 +69,52 @@ public class ParserMatcherTest {
 		final State targetState = transition.getTarget();
 		assertEquals("Transition is not pointing back to StartState", startState, targetState);
 	}
+	
+	@Test
+	public void testMatchStar() {
+		final State startState = Parser.parse("h*");
+		assertTrue("Single not accepted", Matcher.match(startState, "h"));
+		assertTrue("Repeaded char not accepted", Matcher.match(startState, "hhhh"));
+		assertTrue("No char not accepted", Matcher.match(startState, ""));
+		assertFalse("String with wrong chars accepted", Matcher.match(startState, "hiandsoon"));
+	}
+	
+	@Test
+	public void testMatchDotStar() {
+		final State startState = Parser.parse(".*");
+		assertTrue("Single not accepted", Matcher.match(startState, "h"));
+		assertTrue("Repeaded char not accepted", Matcher.match(startState, "hhhh"));
+		assertTrue("No char not accepted", Matcher.match(startState, ""));
+		assertTrue("String with mixed chars not accepted", Matcher.match(startState, "hiandsoon"));
+	}
+	
+	@Test
+	public void testMatchDotStarPrefix() {
+		final State startState = Parser.parse("h.*");
+		assertTrue("Single not accepted", Matcher.match(startState, "h"));
+		assertTrue("Repeaded char not accepted", Matcher.match(startState, "hhhh"));
+		assertFalse("Accepted despite missing prefix", Matcher.match(startState, ""));
+		assertFalse("Accepted despite wrong prefix", Matcher.match(startState, "shkjh"));
+		assertTrue("String with mixed chars not accepted", Matcher.match(startState, "hiandsoon"));
+	}
 
+	@Test
+	public void testMatchStarSuffix() {
+		final State startState = Parser.parse("m*h");
+		assertTrue("Single not accepted", Matcher.match(startState, "h"));
+		assertTrue("Repeaded char not accepted", Matcher.match(startState, "mmmmh"));
+		assertFalse("Accepted despite missing suffix", Matcher.match(startState, ""));
+		assertFalse("Accepted despite missing suffix", Matcher.match(startState, "mmmm"));
+		assertFalse("Accepted despite wrong chars", Matcher.match(startState, "shkjhm"));
+	}
+	
+	@Test
+	public void testMatchDotStarSuffix() {
+		final State startState = Parser.parse(".*h");
+		assertTrue("Single not accepted", Matcher.match(startState, "h"));
+		assertTrue("Repeaded char not accepted", Matcher.match(startState, "hhhh"));
+		assertFalse("Accepted despite missing suffix", Matcher.match(startState, ""));
+		assertFalse("Accepted despite wrong suffix", Matcher.match(startState, "shkjhs"));
+		assertTrue("String with mixed chars not accepted", Matcher.match(startState, "iandshoonh"));
+	}
 }

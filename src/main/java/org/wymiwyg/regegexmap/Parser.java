@@ -28,23 +28,23 @@ public class Parser {
 		return result;
 	}
 
-	private static void parseInto(State result, PushbackReader in) throws IOException {
+	private static void parseInto(State state, PushbackReader in) throws IOException {
 		int currentChar = in.read();
 		if (currentChar == -1) {
-			result.markAsEndState();
+			state.markAsEndState();
 		} else {	
 			int nextChar = in.read();
 			State targetState;
 			switch (nextChar) {
 				case -1: targetState = new State(); break;
-				case '*': targetState = result; break;
+				case '*': targetState = state; break;
 				default: in.unread(nextChar); targetState = new State();
 			}
 			parseInto(targetState, in);
 			if (currentChar == '.') {
-				result.addTransition(new AcceptAny(targetState));
+				state.addTransition(new AcceptAny(targetState));
 			} else {
-				result.addTransition(new AcceptSingle(targetState, (char) currentChar));
+				state.addTransition(new AcceptSingle(targetState, (char) currentChar));
 			}
 		}
 	}
