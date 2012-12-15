@@ -23,7 +23,7 @@ public class Matcher {
 	public static boolean match(State state, Reader reader) throws IOException {
 		int currentChar = reader.read();
 		if (currentChar == -1) {
-			return state instanceof EndState;
+			return state.isEndState();
 		} else {
 			for (Transition t : state.getOutgoingTransitions()) {
 				if (t.accepts((char) currentChar)) {

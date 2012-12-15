@@ -23,11 +23,17 @@ public class Parser {
 	}
 
 	private static State parse(PushbackReader in) throws IOException {
+		State result = new State();
+		paserInto(result, in);
+		return result;
+	}
+
+	private static void paserInto(State result, PushbackReader in) throws IOException {
 		int currentChar = in.read();
 		if (currentChar == -1) {
-			return new EndState();
+			result.markAsEndState();
 		} else {
-			State result = new State();
+			
 			int nextChar = in.read();
 			if (nextChar != -1) {
 				if (nextChar == '*') {
@@ -41,7 +47,6 @@ public class Parser {
 			} else {
 				result.addTransition(new AcceptSingle(parse(in), (char) currentChar));
 			}
-			return result;
 		}
 	}
 
