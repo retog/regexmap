@@ -35,15 +35,10 @@ public class Parser {
 		} else {	
 			int nextChar = in.read();
 			State targetState;
-			if (nextChar != -1) {
-				if (nextChar == '*') {
-					targetState = result;
-				} else {
-					in.unread(nextChar);
-					targetState = new State();
-				}
-			} else {
-				targetState = new State();
+			switch (nextChar) {
+				case -1: targetState = new State(); break;
+				case '*': targetState = result; break;
+				default: in.unread(nextChar); targetState = new State();
 			}
 			parseInto(targetState, in);
 			if (currentChar == '.') {
