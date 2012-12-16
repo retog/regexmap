@@ -5,13 +5,14 @@ import java.util.Set;
 
 public class State {
 	
-	private Set<Transition> transitions = new HashSet<Transition>();
+	Set<Transition> transitions = new HashSet<Transition>();
 	private boolean endState;
 
 	public Set<Transition> getOutgoingTransitions() {
 		return transitions;
 	}
 
+	//remove as set has same visibility
 	void addTransition(Transition transition) {
 		transitions.add(transition);
 		

@@ -3,6 +3,8 @@ package org.wymiwyg.regegexmap;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Parser {
 
@@ -40,13 +42,35 @@ public class Parser {
 				case '*': targetState = state; break;
 				default: in.unread(nextChar); targetState = new State();
 			}
-			parseInto(targetState, in);
 			if (currentChar == '.') {
-				state.addTransition(new AcceptAny(targetState));
+				state.transitions.clear();
+				state.addTransition(new AcceptAllExceptSpecified(targetState));
 			} else {
+				final Set<State> statesOfWhichTransitionsMustBeaddedToTarget 
+					= removeCharFromTransitions(state.transitions, (char) currentChar);
 				state.addTransition(new AcceptSingle(targetState, (char) currentChar));
+				for (State stateToCopyIntoTarget : statesOfWhichTransitionsMustBeaddedToTarget) {
+					targetState.transitions.addAll(stateToCopyIntoTarget.transitions);
+				}
+			}
+			parseInto(targetState, in);
+		}
+	}
+
+	/**
+	 * excludes a char from all transitions in a set and returns the targets of 
+	 * the affected transitions
+	 */
+	private static Set<State> removeCharFromTransitions(Set<Transition> transitions,
+			char ch) {
+		final Set<State> result = new HashSet<State>();
+		for (Transition transition : transitions) {
+			if (transition.accepts(ch)) {
+				transition.exclude(ch);
+				result.add(transition.getTarget());
 			}
 		}
+		return result;
 	}
 
 }

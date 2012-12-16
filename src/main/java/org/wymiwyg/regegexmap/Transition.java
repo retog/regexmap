@@ -14,4 +14,7 @@ public abstract class Transition {
 	public State getTarget() {
 		return state;
 	}
+
+	abstract void exclude(char ch);
+
 }

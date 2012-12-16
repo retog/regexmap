@@ -13,4 +13,9 @@ public class AcceptSingle extends Transition {
 		return ch == acceptedChar;
 	}
 
+	@Override
+	void exclude(char ch) {
+		throw new RuntimeException("Cannot exlude single char");
+	}
+
 }

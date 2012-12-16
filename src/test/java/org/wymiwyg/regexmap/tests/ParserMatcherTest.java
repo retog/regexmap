@@ -108,6 +108,33 @@ public class ParserMatcherTest {
 		assertFalse("Accepted despite wrong chars", Matcher.match(startState, "shkjhm"));
 	}
 	
+	/**
+	 * This should result in a DSA with  a loop-back on start for all but n and 
+	 * a transition for n to a second state, with a transition back to the start state
+	 * for all but n and a loop-back for n.
+	 */
+	@Test
+	public void testParseDotStarSuffix() {
+		final State startState = Parser.parse(".*h");
+		assertNotNull("Result of parsing must not be null", startState);
+		assertEquals("Wrong number of outgoing transitions on start state", 2, 
+				startState.getOutgoingTransitions().size());
+		State otherState = null;
+		boolean loopBackTransitionPresent = false;
+		for (Transition t : startState.getOutgoingTransitions()) {
+			final State target = t.getTarget();
+			if (target == startState) {
+				loopBackTransitionPresent = true;
+			} else {
+				otherState = target;
+			}
+		}
+		assertTrue("No loop back transition on start state", loopBackTransitionPresent);
+		assertTrue("Second State is not an endstate", otherState.isEndState());
+		assertEquals("Wrong number of outgoing transitions on second state", 2, 
+				otherState.getOutgoingTransitions().size());
+	}
+	
 	@Test
 	public void testMatchDotStarSuffix() {
 		final State startState = Parser.parse(".*h");
