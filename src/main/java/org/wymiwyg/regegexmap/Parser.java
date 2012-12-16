@@ -3,6 +3,7 @@ package org.wymiwyg.regegexmap;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,21 +26,33 @@ public class Parser {
 	}
 
 	private static State parse(PushbackReader in) throws IOException {
-		State result = new State();
-		parseInto(result, in);
-		return result;
+		State startState = new State();
+		Set<State> exitStates = parseInto(startState, startState, in);
+		for (State state : exitStates) {
+			state.markAsEndState();
+		}
+		return startState;
 	}
 
-	private static void parseInto(State state, PushbackReader in) throws IOException {
+	/**
+	 * @return the exit states
+	 */
+	private static Set<State> parseInto(State startState, State state, PushbackReader in) throws IOException {
+		
 		int currentChar = in.read();
 		if (currentChar == -1) {
-			state.markAsEndState();
+			return Collections.singleton(state);
 		} else {	
 			int nextChar = in.read();
 			State targetState;
+			boolean processAlternative = false;
 			switch (nextChar) {
 				case -1: targetState = new State(); break;
 				case '*': targetState = state; break;
+				case '|': 
+						targetState = new State(); 
+						processAlternative = true; 
+						break;
 				default: in.unread(nextChar); targetState = new State();
 			}
 			if (currentChar == '.') {
@@ -53,7 +66,14 @@ public class Parser {
 					targetState.transitions.addAll(stateToCopyIntoTarget.transitions);
 				}
 			}
-			parseInto(targetState, in);
+			if (processAlternative) {
+				Set<State> exitStates = new HashSet<State>();
+				exitStates.add(targetState); 
+				exitStates.addAll(parseInto(startState, startState, in));
+				return exitStates;
+			} else {
+				return parseInto(startState, targetState, in);
+			}
 		}
 	}
 

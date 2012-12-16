@@ -157,4 +157,15 @@ public class ParserMatcherTest {
 		assertFalse("Accepted not matching", Matcher.match(startState, "hos"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "sdfds dsafsdoo sd"));
 	}
+	
+	@Test
+	public void testParseOr() {
+		final State startState = Parser.parse("h|o");
+		assertNotNull("Result of parsing must not be null", startState);
+		assertEquals("Wrong number of outgoing transitions on start state", 2, 
+				startState.getOutgoingTransitions().size());
+		for (Transition t : startState.getOutgoingTransitions()) {
+			assertTrue("Second State is not an endstate", t.getTarget().isEndState());
+		}
+	}
 }
