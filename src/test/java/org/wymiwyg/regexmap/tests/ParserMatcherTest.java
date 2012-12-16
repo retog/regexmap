@@ -144,4 +144,17 @@ public class ParserMatcherTest {
 		assertFalse("Accepted despite wrong suffix", Matcher.match(startState, "shkjhs"));
 		assertTrue("String with mixed chars not accepted", Matcher.match(startState, "iandshoonh"));
 	}
+	
+	@Test
+	public void testMatchDotStarComples() {
+		final State startState = Parser.parse(".*h.*o");
+		assertTrue("Minimum not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hhhho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "dfgfdhhkjhkjho"));
+		assertFalse("Accepted not matching", Matcher.match(startState, ""));
+		assertFalse("Accepted not matching", Matcher.match(startState, "h"));
+		assertFalse("Accepted not matching", Matcher.match(startState, "o"));
+		assertFalse("Accepted not matching", Matcher.match(startState, "hos"));
+		assertFalse("Accepted not matching", Matcher.match(startState, "sdfds dsafsdoo sd"));
+	}
 }
