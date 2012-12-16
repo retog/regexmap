@@ -5,6 +5,7 @@ import java.io.PushbackReader;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class Parser {
@@ -72,14 +73,20 @@ public class Parser {
 
 	/**
 	 * excludes a char from all transitions in a set and returns the targets of 
-	 * the affected transitions
+	 * the affected transitions, transition that will no longer accept anything are removed from the set
 	 */
 	private static Set<State> removeCharFromTransitions(Set<Transition> transitions,
 			char ch) {
 		final Set<State> result = new HashSet<State>();
-		for (Transition transition : transitions) {
+		Iterator<Transition> iter = transitions.iterator();
+		while (iter.hasNext()) {
+			Transition transition = iter.next();
 			if (transition.accepts(ch)) {
-				transition.exclude(ch);
+				if (transition instanceof AcceptSingle) {
+					iter.remove();
+				} else {
+					transition.exclude(ch);
+				}
 				result.add(transition.getTarget());
 			}
 		}

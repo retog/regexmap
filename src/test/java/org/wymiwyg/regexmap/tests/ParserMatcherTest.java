@@ -168,4 +168,16 @@ public class ParserMatcherTest {
 			assertTrue("Second State is not an endstate", t.getTarget().isEndState());
 		}
 	}
+	
+	@Test
+	public void testMatchOr() {
+		final State startState = Parser.parse("hi|ho");
+		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hi"));
+		assertFalse("Accepted not matching", Matcher.match(startState, ""));
+		assertFalse("Accepted not matching", Matcher.match(startState, "h"));
+		assertFalse("Accepted not matching", Matcher.match(startState, "o"));
+		assertFalse("Accepted not matching", Matcher.match(startState, "hiho"));
+		assertFalse("Accepted not matching", Matcher.match(startState, "hhitt"));
+	}
 }
