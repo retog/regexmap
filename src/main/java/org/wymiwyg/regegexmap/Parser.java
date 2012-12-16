@@ -40,40 +40,33 @@ public class Parser {
 	private static Set<State> parseInto(State startState, State state, PushbackReader in) throws IOException {
 		
 		int currentChar = in.read();
-		if (currentChar == -1) {
-			return Collections.singleton(state);
-		} else {	
-			int nextChar = in.read();
-			State targetState;
-			boolean processAlternative = false;
-			switch (nextChar) {
-				case -1: targetState = new State(); break;
-				case '*': targetState = state; break;
-				case '|': 
-						targetState = new State(); 
-						processAlternative = true; 
-						break;
-				default: in.unread(nextChar); targetState = new State();
-			}
-			if (currentChar == '.') {
-				state.transitions.clear();
-				state.addTransition(new AcceptAllExceptSpecified(targetState));
-			} else {
-				final Set<State> statesOfWhichTransitionsMustBeaddedToTarget 
-					= removeCharFromTransitions(state.transitions, (char) currentChar);
-				state.addTransition(new AcceptSingle(targetState, (char) currentChar));
-				for (State stateToCopyIntoTarget : statesOfWhichTransitionsMustBeaddedToTarget) {
-					targetState.transitions.addAll(stateToCopyIntoTarget.transitions);
-				}
-			}
-			if (processAlternative) {
+		switch (currentChar) {
+			case -1 : return Collections.singleton(state);
+			case '|':
 				Set<State> exitStates = new HashSet<State>();
-				exitStates.add(targetState); 
+				exitStates.add(state); 
 				exitStates.addAll(parseInto(startState, startState, in));
 				return exitStates;
-			} else {
+			default:
+				int nextChar = in.read();
+				State targetState;
+				switch (nextChar) {
+					case -1: targetState = new State(); break;
+					case '*': targetState = state; break;
+					default: in.unread(nextChar); targetState = new State();
+				}
+				if (currentChar == '.') {
+					state.transitions.clear();
+					state.addTransition(new AcceptAllExceptSpecified(targetState));
+				} else {
+					final Set<State> statesOfWhichTransitionsMustBeaddedToTarget 
+						= removeCharFromTransitions(state.transitions, (char) currentChar);
+					state.addTransition(new AcceptSingle(targetState, (char) currentChar));
+					for (State stateToCopyIntoTarget : statesOfWhichTransitionsMustBeaddedToTarget) {
+						targetState.transitions.addAll(stateToCopyIntoTarget.transitions);
+					}
+				}
 				return parseInto(startState, targetState, in);
-			}
 		}
 	}
 
