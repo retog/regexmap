@@ -18,4 +18,11 @@ public class AcceptSingle extends Transition {
 		throw new RuntimeException("Cannot exlude single char");
 	}
 
+	@Override
+	public String toString() {
+		return "transition acception only: '"+acceptedChar+"'.";
+	}
+	
+	
+
 }

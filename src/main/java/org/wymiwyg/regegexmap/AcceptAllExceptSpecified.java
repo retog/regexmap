@@ -20,5 +20,10 @@ public class AcceptAllExceptSpecified extends Transition {
 	void exclude(char ch) {
 		exceptions.add(ch);
 	}
+	
+	@Override
+	public String toString() {
+		return "transition acception all but: "+exceptions+".";
+	}
 
 }

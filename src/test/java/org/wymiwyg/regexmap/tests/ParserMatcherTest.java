@@ -180,6 +180,7 @@ public class ParserMatcherTest {
 		assertFalse("Accepted not matching", Matcher.match(startState, "hiho"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "hhitt"));
 	}
+	
 	@Test
 	public void testPointlessOr() {
 		State startState = Parser.parse(".*|ho");
@@ -191,5 +192,26 @@ public class ParserMatcherTest {
 		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
 		assertTrue("Matching String not accepted", Matcher.match(startState, "hofsdfgsd"));
 		assertTrue("Matching String not accepted", Matcher.match(startState, ""));
+	}
+	
+	@Test
+	public void testOrAndDotStar() {
+		State startState = Parser.parse(".*o|u");
+		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hofsdfgsdo"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "u"));
+		assertFalse("Accepted not matching", Matcher.match(startState, ""));
+		assertFalse("Accepted not matching", Matcher.match(startState, "hdasdsaodasui"));
+
+	}
+	@Test
+	public void testOrAndComplexExpression() {
+		State startState = Parser.parse(".*o|.*u");
+		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hofsdfgsdu"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "u"));
+		assertFalse("Accepted not matching", Matcher.match(startState, ""));
+		assertFalse("Accepted not matching", Matcher.match(startState, "hdasdsaodasui"));
+
 	}
 }
