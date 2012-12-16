@@ -180,4 +180,16 @@ public class ParserMatcherTest {
 		assertFalse("Accepted not matching", Matcher.match(startState, "hiho"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "hhitt"));
 	}
+	@Test
+	public void testPointlessOr() {
+		State startState = Parser.parse(".*|ho");
+		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hofsdfgsd"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, ""));
+		//and the other way
+		startState = Parser.parse("ho|.*");
+		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hofsdfgsd"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, ""));
+	}
 }
