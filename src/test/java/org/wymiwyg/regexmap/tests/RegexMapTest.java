@@ -2,14 +2,9 @@ package org.wymiwyg.regexmap.tests;
 
 import static org.junit.Assert.*;
 
-import java.util.Set;
 
 import org.junit.Test;
-import org.wymiwyg.regegexmap.Matcher;
-import org.wymiwyg.regegexmap.Parser;
 import org.wymiwyg.regegexmap.RegexMap;
-import org.wymiwyg.regegexmap.State;
-import org.wymiwyg.regegexmap.Transition;
 
 public class RegexMapTest {
 	
