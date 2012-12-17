@@ -150,15 +150,17 @@ public class ParserMatcherTest {
 	
 	@Test
 	public void testMatchDotStarComplex() {
-		final State startState = Parser.parse(".*h.*o");
-		assertTrue("Minimum not accepted", Matcher.match(startState, "ho"));
-		assertTrue("Matching String not accepted", Matcher.match(startState, "hhhho"));
-		assertTrue("Matching String not accepted", Matcher.match(startState, "dfgfdhhkjhkjho"));
-		assertFalse("Accepted not matching", Matcher.match(startState, ""));
-		assertFalse("Accepted not matching", Matcher.match(startState, "h"));
-		assertFalse("Accepted not matching", Matcher.match(startState, "o"));
-		assertFalse("Accepted not matching", Matcher.match(startState, "hos"));
-		assertFalse("Accepted not matching", Matcher.match(startState, "sdfds dsafsdoo sd"));
+		for (int i = 0; i < 1000; i++) {
+			final State startState = Parser.parse(".*h.*o");
+			assertTrue("Minimum not accepted", Matcher.match(startState, "ho"));
+			assertTrue("Matching String not accepted", Matcher.match(startState, "hhhho"));
+			assertTrue("Matching String not accepted", Matcher.match(startState, "dfgfdhhkjhkjho"));
+			assertFalse("Accepted not matching", Matcher.match(startState, ""));
+			assertFalse("Accepted not matching", Matcher.match(startState, "h"));
+			assertFalse("Accepted not matching", Matcher.match(startState, "o"));
+			assertFalse("Accepted not matching", Matcher.match(startState, "hos"));
+			assertFalse("Accepted not matching", Matcher.match(startState, "sdfds dsafsdoo sd"));
+		}
 	}
 	
 	@Test
@@ -175,12 +177,8 @@ public class ParserMatcherTest {
 	@Test
 	public void testMatchOr() {
 		final State startState = Parser.parse("hi|ho");
-		if (!Matcher.match(startState, "ho")) {
-			assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
-		}
-		if (!Matcher.match(startState, "hi")) {
-			assertTrue("Matching String not accepted", Matcher.match(startState, "hi"));
-		}
+		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		assertTrue("Matching String not accepted", Matcher.match(startState, "hi"));
 		assertFalse("Accepted not matching", Matcher.match(startState, ""));
 		assertFalse("Accepted not matching", Matcher.match(startState, "h"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "o"));

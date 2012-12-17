@@ -104,7 +104,9 @@ public class TransitionManager {
 			if (!outgoingPair.equals(pair) && wildCards.contains(outgoingPair)) {
 				//throw new RuntimeException("Cannot add two wildcards");
 				//just removing the old one
-				removeWildcard(outgoingPair.s1, outgoingPair.s2);
+				//removeWildcard(outgoingPair.s1, outgoingPair.s2);
+				//new one
+				removeWildcard(pair.s1, pair.s2);
 				break;
 			}
 		}
