@@ -2,6 +2,8 @@ package org.wymiwyg.regexmap.tests;
 
 import static org.junit.Assert.*;
 
+import java.util.Set;
+
 import org.junit.Test;
 import org.wymiwyg.regegexmap.Matcher;
 import org.wymiwyg.regegexmap.Parser;
@@ -109,9 +111,9 @@ public class ParserMatcherTest {
 	}
 	
 	/**
-	 * This should result in a DSA with  a loop-back on start for all but n and 
-	 * a transition for n to a second state, with a transition back to the start state
-	 * for all but n and a loop-back for n.
+	 * This should result in a DSA with  a loop-back on start for all but 'h' and 
+	 * a transition for 'h' to a second state, with a transition back to the start state
+	 * for all but n and a loop-back for 'h'.
 	 */
 	@Test
 	public void testParseDotStarSuffix() {
@@ -139,14 +141,15 @@ public class ParserMatcherTest {
 	public void testMatchDotStarSuffix() {
 		final State startState = Parser.parse(".*h");
 		assertTrue("Single not accepted", Matcher.match(startState, "h"));
-		assertTrue("Repeaded char not accepted", Matcher.match(startState, "hhhh"));
+		assertTrue("Double char not accepted", Matcher.match(startState, "hh"));
+		assertTrue("Triple char not accepted", Matcher.match(startState, "hhh"));
 		assertFalse("Accepted despite missing suffix", Matcher.match(startState, ""));
 		assertFalse("Accepted despite wrong suffix", Matcher.match(startState, "shkjhs"));
 		assertTrue("String with mixed chars not accepted", Matcher.match(startState, "iandshoonh"));
 	}
 	
 	@Test
-	public void testMatchDotStarComples() {
+	public void testMatchDotStarComplex() {
 		final State startState = Parser.parse(".*h.*o");
 		assertTrue("Minimum not accepted", Matcher.match(startState, "ho"));
 		assertTrue("Matching String not accepted", Matcher.match(startState, "hhhho"));
@@ -172,13 +175,76 @@ public class ParserMatcherTest {
 	@Test
 	public void testMatchOr() {
 		final State startState = Parser.parse("hi|ho");
-		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
-		assertTrue("Matching String not accepted", Matcher.match(startState, "hi"));
+		if (!Matcher.match(startState, "ho")) {
+			assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		}
+		if (!Matcher.match(startState, "hi")) {
+			assertTrue("Matching String not accepted", Matcher.match(startState, "hi"));
+		}
 		assertFalse("Accepted not matching", Matcher.match(startState, ""));
 		assertFalse("Accepted not matching", Matcher.match(startState, "h"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "o"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "hiho"));
 		assertFalse("Accepted not matching", Matcher.match(startState, "hhitt"));
+	}
+	
+	/**
+	 * We expect the start state s1 to have a loop back for
+	 * ./h, an n-loopback transition and an h-transition to s2, s2. to have a ./o transition
+	 * back to to start and an o-transition to s3 and s3 to have
+	 * a . transition to start and a h transition to s2, all nodes are end states
+	 */
+	@Test
+	public void testParsePointlessOr() {
+		State s1 = Parser.parse(".*|ho");
+		verifyPointlessOr(s1);
+	}
+	/**
+	 * same again
+	 */
+	@Test
+	public void testParsePointlessOr2() {
+		State s1 = Parser.parse("ho|.*");
+		verifyPointlessOr(s1);
+	}
+	
+	private void verifyPointlessOr(State s1) {
+		assertNotNull("Result of parsing must not be null", s1);
+		Set<Transition> s1Transitions = s1.getOutgoingTransitions();
+		assertEquals("Wrong number of outgoing transitions", 2, s1Transitions.size());
+		Transition loopBackTransition = null;
+		Transition s1s2 = null;
+		for (Transition transition : s1Transitions) {
+			if (transition.getTarget() == s1) {
+				loopBackTransition = transition;
+			} else {
+				s1s2 = transition;
+			}
+		}
+		State s2 = s1s2.getTarget();
+		assertNotNull("Transition not looping back", loopBackTransition);
+		assertTrue("Transition not acception the right char", s1s2.accepts('h'));
+		assertFalse("Transition char it shouldn't", loopBackTransition.accepts('h'));
+		assertTrue("StartState must be an endstate", s1.isEndState());
+		assertFalse("S2 must not be an endstate", s2.isEndState());
+		Set<Transition> s2Transitions = s2.getOutgoingTransitions();
+		//3 because there's a n-loopback transition 
+		assertEquals("Wrong number of outgoing transitions", 3, s2Transitions.size());
+		Transition s2s1 = null;
+		Transition s2s3 = null;
+		for (Transition transition : s2Transitions) {
+			if (transition.getTarget() == s1) {
+				s2s1 = transition;
+			} else {
+				if (transition.getTarget() != s2) {
+					s2s3 = transition;
+				}
+			}
+		}
+		assertNotNull("Transition from s2 back to start missing", s2s1);
+		assertTrue("Transition not accepting the right char", s2s3.accepts('o'));
+		final State s3 = s2s3.getTarget();
+		assertEquals("Wrong number of transitions on s3", 2, s3.getOutgoingTransitions().size());
 	}
 	
 	@Test
@@ -190,6 +256,7 @@ public class ParserMatcherTest {
 		//and the other way
 		startState = Parser.parse("ho|.*");
 		assertTrue("Matching String not accepted", Matcher.match(startState, "ho"));
+		//fails some times, not wlways!
 		assertTrue("Matching String not accepted", Matcher.match(startState, "hofsdfgsd"));
 		assertTrue("Matching String not accepted", Matcher.match(startState, ""));
 	}

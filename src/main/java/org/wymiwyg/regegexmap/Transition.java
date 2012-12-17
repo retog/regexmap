@@ -1,20 +1,27 @@
 package org.wymiwyg.regegexmap;
 
+import java.util.Set;
+
 public abstract class Transition {
 
-	private State state;
+	private State target;
 	
-	Transition(State state) {
+	Transition(State target) {
 		super();
-		this.state = state;
+		this.target = target;
 	}
 
 	public abstract boolean accepts(char ch);
 
 	public State getTarget() {
-		return state;
+		return target;
 	}
 
-	abstract void exclude(char ch);
+	abstract boolean isWildCard();
+
+	/*return null if wildcard
+	 * 
+	 */
+	public abstract Set<Character> getAcceptedChars();
 
 }

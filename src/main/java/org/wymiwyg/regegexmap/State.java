@@ -5,18 +5,20 @@ import java.util.Set;
 
 public class State {
 	
-	Set<Transition> transitions = new HashSet<Transition>();
+	int id;
+
 	private boolean endState;
+	private TransitionManager tm;
+	
+	State(TransitionManager tm) {
+		this.tm = tm;
+		id = tm.getStateId();
+	}
 
 	public Set<Transition> getOutgoingTransitions() {
-		return transitions;
+		return tm.getTransitionsFrom(this);
 	}
 
-	//remove as set has same visibility
-	void addTransition(Transition transition) {
-		transitions.add(transition);
-		
-	}
 
 	void markAsEndState() {
 		endState = true;
@@ -25,5 +27,12 @@ public class State {
 	public boolean isEndState() {
 		return endState;
 	}
+
+	@Override
+	public String toString() {
+		return "[State "+id+"]";
+	}
+	
+	
 
 }
