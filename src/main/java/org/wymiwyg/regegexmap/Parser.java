@@ -43,9 +43,10 @@ public class Parser {
 		//make sure nothing point back to startState, if so create clone of startstate to whih things oint back
 		int currentChar = in.read();
 		switch (currentChar) {
-			case -1 : return Collections.singleton(state);
+			case -1 : state.markAsEndState(); return Collections.singleton(state);
 			case '|':
 				Set<State> exitStates = new HashSet<State>();
+				state.markAsEndState();
 				exitStates.add(state); 
 				exitStates.addAll(parseInto(startState, startState, in, tm));
 				return exitStates;

@@ -223,8 +223,8 @@ public class ParserMatcherTest {
 		assertNotNull("Transition not looping back", loopBackTransition);
 		assertTrue("Transition not acception the right char", s1s2.accepts('h'));
 		assertFalse("Transition char it shouldn't", loopBackTransition.accepts('h'));
-		assertTrue("StartState must be an endstate", s1.isEndState());
-		assertFalse("S2 must not be an endstate", s2.isEndState());
+		assertTrue("s1 is not and an endstate", s1.isEndState());
+		assertTrue("S2 is not an endstate", s2.isEndState());
 		Set<Transition> s2Transitions = s2.getOutgoingTransitions();
 		//3 because there's a n-loopback transition 
 		assertEquals("Wrong number of outgoing transitions", 3, s2Transitions.size());
@@ -243,6 +243,7 @@ public class ParserMatcherTest {
 		assertTrue("Transition not accepting the right char", s2s3.accepts('o'));
 		final State s3 = s2s3.getTarget();
 		assertEquals("Wrong number of transitions on s3", 2, s3.getOutgoingTransitions().size());
+		assertTrue("s3 is not and an endstate", s3.isEndState());
 	}
 	
 	@Test
