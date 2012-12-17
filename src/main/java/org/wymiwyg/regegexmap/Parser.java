@@ -18,22 +18,39 @@ public class Parser {
 
 	}
 
+	/**
+	 * 
+	 * @param string
+	 * @return the startState
+	 */
 	public static State parse(String string) {
+		TransitionManager tm = new TransitionManager();
+		State startState = new State(tm);
+		parseInto(tm, startState, string);
+		return startState;
+	}
+	
+	/**
+	 * 
+	 * @param tm
+	 * @param startState
+	 * @param string
+	 * @return the exit states
+	 */
+	public static Set<State> parseInto(TransitionManager tm, State startState, String string) {
 		try {
-			return parse(new PushbackReader(new StringReader(string), 1));
+			return parseInto(tm, startState, new PushbackReader(new StringReader(string), 1));
 		} catch (IOException e) {
 			throw new RuntimeException("IO reading from string", e);
 		}
 	}
 
-	private static State parse(PushbackReader in) throws IOException {
-		TransitionManager tm = new TransitionManager();
-		State startState = new State(tm);
+	private static Set<State> parseInto(TransitionManager tm, State startState, PushbackReader in) throws IOException {
 		Set<State> exitStates = parseInto(startState, startState, in, tm);
 		for (State state : exitStates) {
 			state.markAsEndState();
 		}
-		return startState;
+		return exitStates;
 	}
 
 	/**

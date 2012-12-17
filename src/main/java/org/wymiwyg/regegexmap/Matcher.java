@@ -13,26 +13,31 @@ public class Matcher {
 	 * @return true if all chars of strings are accepted and lead ton an EndState, false otherwise
 	 */
 	public static boolean match(State state, String string) {
+		return matchToState(state, string) != null;
+	}
+	public static State matchToState(State state, String string) {
 		try {
-			return match(state, new StringReader(string));
+			return matchToState(state, new StringReader(string));
 		} catch (IOException e) {
 			throw new RuntimeException("IO reading from string", e);
 		}
 	}
 
-	public static boolean match(State state, Reader reader) throws IOException {
+	public static State matchToState(State state, Reader reader) throws IOException {
 		int currentChar = reader.read();
 		if (currentChar == -1) {
-			return state.isEndState();
+			if (state.isEndState()) {
+				return state;
+			}
 		} else {
 			for (Transition t : state.getOutgoingTransitions()) {
 				if (t.accepts((char) currentChar)) {
 					//We deal with DFA so only one transitions accepts
-					return match(t.getTarget(), reader);
+					return matchToState(t.getTarget(), reader);
 				}
 			}
-			return false;
 		}
+		return null;
 		
 	}
 }
